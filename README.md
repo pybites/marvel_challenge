@@ -1,4 +1,4 @@
-# comics_data
+# Marvel Data Analysis With Core Python
 
 Create a virtualenv - see [here](https://pybit.es/the-beauty-of-virtualenv.html).
 
