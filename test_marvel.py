@@ -1,4 +1,5 @@
-from collections import namedtuple
+from collections import OrderedDict
+
 import pytest
 
 from marvel import (convert_csv_to_dict,
@@ -7,26 +8,27 @@ from marvel import (convert_csv_to_dict,
                     percentage_female,
                     good_vs_bad)
 
-def _to_dict(nt):
-    return type(nt) == namedtuple and nt._asdict or nt
-
 
 def test_convert_csv_to_dict():
     data = list(convert_csv_to_dict())
     assert len(data) == 16376
 
-    first_row = list(data[0].values())
-    assert '1678' in first_row
+    # this is a bit tricky: people can use standard DictReader's
+    # OrderedDict or they go with namedtuple as suggested
+    uses_od = type(data[0]) == OrderedDict
+
+    first_row = data[0].values() if uses_od else list(data[0])
+    assert '1678' in first_row or '1678' in data[0].values()
     assert 'Spider-Man' in first_row
 
-    last_row = list(data[-1].values())
+    last_row = data[-1].values() if uses_od else list(data[-1])
     assert 'Yologarch' in last_row
     assert 'Bad Characters' in last_row
 
     # number of first appearances should match
-    year = 'year' if 'year' in data[0].keys() else 'Year'
     expected_count = 15561
-    actual_count = sum(bool(_to_dict(d)[year]) and 1 for d in data)
+    actual_count = sum(bool(d['year']) if type(d) == OrderedDict
+                       else bool(d.year) for d in data)
     assert expected_count == actual_count
 
 
