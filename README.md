@@ -31,6 +31,8 @@ test_marvel.py .....
 
 ## Win a Python book!
 
+(Live workshop only)
+
 Whoever submits the first working solution receives a hardcopy of [Automate the Boring Stuff](https://automatetheboringstuff.com/) (it's cool, it [surely helped us](https://pybit.es/automate_the_boring_stuff_review.html)).
 
 In order to win make sure you submit a Pull Request to our repo (not sure how? We are here to help you!)
