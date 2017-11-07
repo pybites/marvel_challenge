@@ -35,8 +35,8 @@ def most_popular_characters(n=5):
     '''get the most popular character by number of appearances
        accept an argument of n (int) of most popular characters
        to return (leave default of 5)'''
-    common = sorted(data,
-                    key=lambda x: x and x.appearances,
+    common = sorted([d for d in data if d.appearances.isdigit()],
+                    key=lambda x: int(x.appearances),
                     reverse=True)
     return [c.name for c in common[:n]]
 
