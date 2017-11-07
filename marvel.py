@@ -8,10 +8,10 @@ Character = namedtuple('Character', 'pid name sid align sex appearances year')
 
 
 def convert_csv_to_dict(data=DATA):
-    '''write a function to parse marvel-wikia-data.csv into a dict
+    '''write a function to parse marvel-wikia-data.csv, see
        https://docs.python.org/3.7/library/csv.html#csv.DictReader
        should return a list of OrderedDicts or a list of Character
-       namedtuples (see 'Character' above')'''
+       namedtuples (see Character namedtuple above')'''
     with open(data) as csvfile:
         for row in csv.DictReader(csvfile):
             name = re.sub(r'(.*?)\(.*', r'\1', row['name']).strip()
@@ -33,8 +33,8 @@ data = list(convert_csv_to_dict())
 
 def most_popular_characters(n=5):
     '''get the most popular character by number of appearances
-       accept an argument of n = number of most popular characters
-       to return'''
+       accept an argument of n (int) of most popular characters
+       to return (leave default of 5)'''
     common = sorted(data,
                     key=lambda x: x and x.appearances,
                     reverse=True)
@@ -43,7 +43,9 @@ def most_popular_characters(n=5):
 
 def max_and_min_years_new_characters():
     '''Get the year with most and least new characters introduced respectively,
-       return a tuple of (max_year, min_year)'''
+       use either the 'FIRST APPEARANCE' or 'Year' column in the csv data, or
+       the 'year' attribute of the namedtuple, return a tuple of
+       (max_year, min_year)'''
     max_ = Counter(d.year for d in data if d.year).most_common(1)[0][0]
     min_ = Counter(d.year for d in data if d.year).most_common()[-1][0]
     return (max_, min_)
@@ -65,8 +67,8 @@ def good_vs_bad(sex):
        to only receive 'male' or 'female' as valid inputs (should
        be case insensitive, so could also pass it MALE)
 
-       The expected result should be a dict with these keys and
-       values percentages, rounded integers (values made up here):
+       The expected result should be a the following dict. The values are
+       rounded (int) percentages (values made up here):
 
        expected = {'Bad Characters': 33,
                    'Good Characters': 33,
