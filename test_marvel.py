@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import pytest
 
 from marvel import (convert_csv_to_dict,
@@ -11,26 +13,23 @@ def test_convert_csv_to_dict():
     data = list(convert_csv_to_dict())
     assert len(data) == 16376
 
-    expected_id = '1678'
-    # could be a namedtuple or OrderedDict
-    if hasattr(data[0], 'pid'):
-        assert data[0].pid == expected_id
-    else:
-        assert expected_id in data[0].values()
-    expected_name = 'Yologarch'
+    # this is a bit tricky: people can use standard DictReader's
+    # OrderedDict or they go with namedtuple as suggested
+    uses_od = type(data[0]) == OrderedDict
 
-    # same: account for different data structures
-    if hasattr(data[-1], 'name'):
-        assert data[-1].name == expected_name
-    else:
-        assert expected_name in data[-1].values()
+    first_row = data[0].values() if uses_od else list(data[0])
+    assert '1678' in first_row or '1678' in data[0].values()
+    assert 'Spider-Man' in first_row
+
+    last_row = data[-1].values() if uses_od else list(data[-1])
+    assert 'Yologarch' in last_row
+    assert 'Bad Characters' in last_row
 
     # number of first appearances should match
     expected_count = 15561
-    if hasattr(data[0], 'pid'):
-        sum(bool(d.year) and 1 for d in data) == expected_count
-    else:
-        sum(bool(d['Year']) and 1 for d in data) == expected_count
+    actual_count = sum(bool(d['year']) if type(d) == OrderedDict
+                       else bool(d.year) for d in data)
+    assert expected_count == actual_count
 
 
 def test_most_popular_characters():
@@ -38,18 +37,20 @@ def test_most_popular_characters():
     len(most_popular_characters()) == 5
     len(most_popular_characters(3)) == 3
 
-    expected = ['Louise Grant',
-                'Grand Vizier',
-                'Pyreus Kril',
-                'Acroyear',
-                'Yuriko Oyama']
+    expected = ['Spider-Man',
+                'Captain America',
+                'Wolverine',
+                'Iron Man',
+                'Thor']
     # order does not matter, should include these
     for exp in expected:
         assert exp in most_popular_characters()
 
 
 def test_max_and_min_years_new_characters():
-    assert max_and_min_years_new_characters() == ('1993', '1958')
+    max_, min_ = max_and_min_years_new_characters()
+    assert int(max_) == 1993
+    assert int(min_) == 1958
 
 
 def test_percentage_female():
