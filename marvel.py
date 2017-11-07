@@ -12,7 +12,20 @@ def convert_csv_to_dict(data=DATA):
        https://docs.python.org/3.7/library/csv.html#csv.DictReader
        should return a list of OrderedDicts or a list of Character
        namedtuples (see 'Character' above')'''
-    pass
+    with open(data) as csvfile:
+        for row in csv.DictReader(csvfile):
+            name = re.sub(r'(.*?)\(.*', r'\1', row['name']).strip()
+            # could do:
+            # yield row
+            # but namedtuple is more elgant
+            # tried to make pytest work with both
+            yield Character(pid=row['page_id'],
+                            name=name,
+                            sid=row['ID'],
+                            align=row['ALIGN'],
+                            sex=row['SEX'],
+                            appearances=row['APPEARANCES'],
+                            year=row['Year'])
 
 
 data = list(convert_csv_to_dict())
@@ -22,19 +35,28 @@ def most_popular_characters(n=5):
     '''get the most popular character by number of appearances
        accept an argument of n = number of most popular characters
        to return'''
-    pass
+    common = sorted(data,
+                    key=lambda x: x and x.appearances,
+                    reverse=True)
+    return [c.name for c in common[:n]]
 
 
 def max_and_min_years_new_characters():
     '''Get the year with most and least new characters introduced respectively,
        return a tuple of (max_year, min_year)'''
-    pass
+    max_ = Counter(d.year for d in data if d.year).most_common(1)[0][0]
+    min_ = Counter(d.year for d in data if d.year).most_common()[-1][0]
+    return (max_, min_)
 
 
 def percentage_female():
     '''Get the percentage of female characters, only look at male and female,
        ignore the rest, return a percentage rounded to 2 digits'''
-    pass
+    sexes = Counter(d.sex for d in data)
+    sex_female = sexes['Female Characters']
+    sex_male = sexes['Male Characters']
+    female_perc = sex_female / (sex_female + sex_male) * 100
+    return round(female_perc, 2)
 
 
 def good_vs_bad(sex):
@@ -50,7 +72,17 @@ def good_vs_bad(sex):
                    'Good Characters': 33,
                    'Neutral Characters': 33})
     '''
-    pass
+    sex = sex.lower()
+    if sex not in 'male female'.split():
+        raise ValueError('not a valid sex')
+
+    sex = sex.title() + ' Characters'
+    cnt = Counter(d.align for d in data if d.align and d.sex == sex)
+    total = sum(cnt.values())
+    cnt2 = {}
+    for k, v in cnt.items():
+        cnt2[k] = round(v/total*100)
+    return cnt2
 
 
 if __name__ == '__main__':
