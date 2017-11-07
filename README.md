@@ -29,6 +29,8 @@ test_marvel.py .....
 (venv) [bbelderb@macbook marvel (master)]$
 ~~~~
 
-## Submit your work
+## Win a Python book!
 
-You can win a book by PR'ing a working solution to our rpeo's community branch.
+Whoever submits the first working solution receives a hardcopy of [Automate the Boring Stuff](https://automatetheboringstuff.com/) (it's cool, it [surely helped us](https://pybit.es/automate_the_boring_stuff_review.html)).
+
+In order to win make sure you submit a Pull Request to our repo (not sure how? We are here to help you!)
