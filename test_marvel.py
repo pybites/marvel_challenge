@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 import pytest
 
 from marvel import (convert_csv_to_dict,
@@ -13,38 +11,17 @@ def test_convert_csv_to_dict():
     data = list(convert_csv_to_dict())
     assert len(data) == 16376
 
-    # this is a bit tricky: people can use standard DictReader's
-    # OrderedDict or they go with namedtuple as suggested
-    uses_od = type(data[0]) == OrderedDict
-
-    first_row = data[0].values() if uses_od else list(data[0])
-    assert '1678' in first_row or '1678' in data[0].values()
-    assert 'Spider-Man' in first_row
-
-    last_row = data[-1].values() if uses_od else list(data[-1])
-    assert 'Yologarch' in last_row
-    assert 'Bad Characters' in last_row
-
-    # number of first appearances should match
-    expected_count = 15561
-    actual_count = sum(bool(d['year']) if type(d) == OrderedDict
-                       else bool(d.year) for d in data)
-    assert expected_count == actual_count
-
 
 def test_most_popular_characters():
-    # test call arg
-    len(most_popular_characters()) == 5
-    len(most_popular_characters(3)) == 3
-
-    expected = ['Spider-Man',
-                'Captain America',
-                'Wolverine',
-                'Iron Man',
-                'Thor']
-    # order does not matter, should include these
-    for exp in expected:
-        assert exp in most_popular_characters()
+    expected_no_arg_or_arg_5 = ['Spider-Man',
+                                'Captain America',
+                                'Wolverine',
+                                'Iron Man',
+                                'Thor']
+    expected_arg_3 = expected_no_arg_or_arg_5[:3]
+    most_popular_characters() == expected_no_arg_or_arg_5
+    most_popular_characters(5) == expected_no_arg_or_arg_5
+    most_popular_characters(3) == expected_arg_3
 
 
 def test_max_and_min_years_new_characters():
@@ -64,7 +41,7 @@ def test_good_vs_bad():
     with pytest.raises(ValueError):
         assert good_vs_bad('wrong_val')
 
-    males = good_vs_bad('MALE')  # case does not matter
+    males = good_vs_bad('MALE')  # case should not matter
     assert males.get('Bad Characters') == 55
     assert males.get('Good Characters') == 30
     assert males.get('Neutral Characters') == 15
