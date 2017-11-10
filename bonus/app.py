@@ -1,4 +1,6 @@
 from collections import Counter
+import os
+import sys
 
 from flask import Flask, render_template
 
@@ -8,11 +10,16 @@ from bokeh.resources import INLINE
 from bokeh.util.string import encode_utf8
 from bokeh.models import ColumnDataSource, LabelSet
 
-from marvel import data
 
 TITLE = 'New Comic Book Characters Introduced Per Year'
 
 app = Flask(__name__)
+
+# https://stackoverflow.com/a/1054293
+one_up = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+sys.path.append(one_up)
+
+from marvel import data
 
 
 def get_new_characters_counts(data=data):
