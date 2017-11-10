@@ -12,7 +12,7 @@ def convert_csv_to_dict(data=DATA):
        https://docs.python.org/3.7/library/csv.html#csv.DictReader
        should return a list of OrderedDicts or a list of Character
        namedtuples (see Character namedtuple above')'''
-    pass
+    pass  # test
 
 
 data = list(convert_csv_to_dict())
