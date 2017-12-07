@@ -30,7 +30,8 @@ class TestMarvel(unittest.TestCase):
         self.assertEqual(int(min_), 1958)
 
     def test_percentage_female(self):
-        self.assertEqual(percentage_female(), 24.79)
+        'two valid answers, depending number of genders in denominator'
+        self.assertIn(percentage_female(), (24.79, 23.43))
 
     def test_good_vs_bad(self):
         # test call arg
