@@ -1,6 +1,5 @@
 from collections import Counter, namedtuple
 import csv
-import re
 
 DATA = 'marvel-wikia-data.csv'
 
@@ -12,7 +11,8 @@ def convert_csv_to_dict(data=DATA):
        https://docs.python.org/3.7/library/csv.html#csv.DictReader
        should return a list of OrderedDicts or a list of Character
        namedtuples (see Character namedtuple above')'''
-    pass
+    with open(data) as csv_file:
+        return [row for row in csv.DictReader(csv_file)]
 
 
 data = list(convert_csv_to_dict())
@@ -22,7 +22,8 @@ def most_popular_characters(n=5):
     '''get the most popular character by number of appearances
        accept an argument of n (int) of most popular characters
        to return (leave default of 5)'''
-    pass
+    return [character['name'].split('(')[0].strip() for character in sorted(data, key=lambda x: int(x['APPEARANCES'])
+            if x['APPEARANCES'] else 0, reverse=True)][:n]
 
 
 def max_and_min_years_new_characters():
@@ -30,13 +31,22 @@ def max_and_min_years_new_characters():
        use either the 'FIRST APPEARANCE' or 'Year' column in the csv data, or
        the 'year' attribute of the namedtuple, return a tuple of
        (max_year, min_year)'''
-    pass
+    years = [character['Year'] for character in data if character['Year']]
+    cnt = Counter(years)
+    max_year = cnt.most_common()[0][0]
+    min_year = cnt.most_common()[-1][0]
+    return max_year, min_year
 
 
 def percentage_female():
     '''Get the percentage of female characters, only look at male and female
        for total, ignore the rest, return a percentage rounded to 2 digits'''
-    pass
+    human_characters = [character['SEX'] for character in data if character['SEX'] in ('Male Characters',
+                                                                                       'Female Characters')]
+    cnt_human_characters = Counter(human_characters)
+    total_characters = (cnt_human_characters['Female Characters'] + cnt_human_characters['Male Characters'])
+    female_characters = cnt_human_characters['Female Characters']
+    return round((female_characters/total_characters) * 100, 2)
 
 
 def good_vs_bad(sex):
@@ -52,7 +62,20 @@ def good_vs_bad(sex):
                    'Good Characters': 33,
                    'Neutral Characters': 33})
     '''
-    pass
+
+    if not sex.lower() in ('male', 'female'):
+        raise ValueError
+
+    characters = [character['ALIGN'] for character in data if sex.title() in character['SEX']]
+    cnt_characters = Counter(characters)
+    total_characters = (cnt_characters['Bad Characters'] + cnt_characters['Good Characters'] +
+                        cnt_characters['Neutral Characters'])
+
+    return {
+            'Bad Characters': round((cnt_characters['Bad Characters'] / total_characters) * 100),
+            'Good Characters': round((cnt_characters['Good Characters'] / total_characters) * 100),
+            'Neutral Characters': round((cnt_characters['Neutral Characters'] / total_characters) * 100)
+            }
 
 
 if __name__ == '__main__':
