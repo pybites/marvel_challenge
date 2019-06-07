@@ -12,7 +12,20 @@ def convert_csv_to_dict(data=DATA):
        https://docs.python.org/3.7/library/csv.html#csv.DictReader
        should return a list of OrderedDicts or a list of Character
        namedtuples (see Character namedtuple above')'''
-    pass
+    lst = []
+    with open(data, "r") as infile:
+        reader = csv.DictReader(infile)
+        for row in reader:
+            c = Character(  row['page_id'], 
+                            row['name'], 
+                            row['ID'], 
+                            row['ALIGN'], 
+                            row['SEX'],
+                            row['APPEARANCES'],
+                            row['Year']
+                        )
+            lst.append(c)
+    return lst
 
 
 data = list(convert_csv_to_dict())
@@ -22,7 +35,16 @@ def most_popular_characters(n=5):
     '''get the most popular character by number of appearances
        accept an argument of n (int) of most popular characters
        to return (leave default of 5)'''
-    pass
+    res =   list(sorted(
+                            [x for x in data], key=lambda x: int(x.appearances) \
+                            if x.appearances != "" else 0, reverse=True
+                        )
+                )[:n]
+
+    pattern = re.compile("(.*)\s\(")
+    characters = [pattern.search(x.name).group(1) for x in res]
+    return characters
+    
 
 
 def max_and_min_years_new_characters():
@@ -30,13 +52,20 @@ def max_and_min_years_new_characters():
        use either the 'FIRST APPEARANCE' or 'Year' column in the csv data, or
        the 'year' attribute of the namedtuple, return a tuple of
        (max_year, min_year)'''
-    pass
+    res = Counter([x.year for x in data if x.year != ""])
+    most_common = res.most_common()
+    return most_common()[0][0], most_common()[-1][0]
+
 
 
 def percentage_female():
     '''Get the percentage of female characters, only look at male and female
        for total, ignore the rest, return a percentage rounded to 2 digits'''
-    pass
+    # print(len(data))
+    # print(len([x for x in data if x.sex == "Female Characters"])/ len(data))
+    return round(   (len([x for x in data if x.sex == "Female Characters"])/ \
+                    len([x for x in data if x.sex == "Female Characters" or \
+                    x.sex == "Male Characters"]))*100,2)
 
 
 def good_vs_bad(sex):
@@ -52,7 +81,20 @@ def good_vs_bad(sex):
                    'Good Characters': 33,
                    'Neutral Characters': 33})
     '''
-    pass
+    if sex.lower() not in ['male', 'female']:
+        raise ValueError
+
+    expected = {    'Bad Characters': 0,
+                    'Good Characters': 0,
+                    'Neutral Characters': 0
+                }
+    res = [x for x in data if x.sex == sex.capitalize() + " Characters" and x.align != ""]
+    t = len(res)
+    c = Counter([x.align for x in res])
+    for item in c.most_common():
+        expected[item[0]] = int(round(item[1]/t,2)*100)
+    return expected
+
 
 
 if __name__ == '__main__':
